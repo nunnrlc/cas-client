@@ -38,11 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeRequests().regexMatchers("/secured.*", "/login").authenticated().and().authorizeRequests()
-				.regexMatchers("/").permitAll().and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
-				.and().logout().logoutSuccessUrl("/logout").and()
-				.addFilterBefore(singleSignOutFilter, CasAuthenticationFilter.class)
-				.addFilterBefore(logoutFilter, LogoutFilter.class);
+		httpSecurity.authorizeRequests().regexMatchers("/secured.*", "/login").authenticated()
+				.and().authorizeRequests().regexMatchers("/").permitAll()
+				.and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
+				.and().logout().logoutSuccessUrl("/logout")
+				.and()
+					.addFilterBefore(singleSignOutFilter, CasAuthenticationFilter.class)
+					.addFilterBefore(logoutFilter, LogoutFilter.class);
 	}
 
 	@Override

@@ -27,6 +27,15 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
 
+	@Primary
+	@Bean
+	public AuthenticationEntryPoint authenticationEntryPoint(ServiceProperties serviceProperties) {
+		CasAuthenticationEntryPoint entryPoint = new CasAuthenticationEntryPoint();
+		entryPoint.setLoginUrl("https://localhost:6443/cas/login");
+		entryPoint.setServiceProperties(serviceProperties);
+		return entryPoint;
+	}
+
 	@Bean
 	public ServiceProperties serviceProperties() {
 		ServiceProperties serviceProperties = new ServiceProperties();
@@ -36,24 +45,15 @@ public class Application {
 	}
 
 	@Bean
-	@Primary
-	public AuthenticationEntryPoint authenticationEntryPoint(ServiceProperties serviceProperties) {
-		CasAuthenticationEntryPoint entryPoint = new CasAuthenticationEntryPoint();
-		entryPoint.setLoginUrl("https://localhost:6443/cas/login");
-		entryPoint.setServiceProperties(serviceProperties);
-		return entryPoint;
-	}
-
-	@Bean
 	public TicketValidator ticketValidator() {
 		return new Cas30ServiceTicketValidator("https://localhost:6443/cas");
 	}
 
 	@Bean
-	public CasAuthenticationProvider casAuthenticationProvider() {
+	public CasAuthenticationProvider casAuthenticationProvider(ServiceProperties serviceProperties, TicketValidator ticketValidator) {
 		CasAuthenticationProvider provider = new CasAuthenticationProvider();
-		provider.setServiceProperties(serviceProperties());
-		provider.setTicketValidator(ticketValidator());
+		provider.setServiceProperties(serviceProperties);
+		provider.setTicketValidator(ticketValidator);
 		provider.setUserDetailsService(s -> new User("casuser", "Mellon", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_ADMIN")));
 		provider.setKey("CAS_PROVIDER_LOCALHOST_9000");
 		return provider;
